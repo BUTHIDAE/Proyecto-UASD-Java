@@ -4,96 +4,132 @@
  */
 package consultauasd;
 
-/**
- *
- * @author Harlem Castillo
- */
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
 public class VentanaCarreras extends JFrame {
 
-    private JComboBox<String> comboEscuelas;
+    private JComboBox<String> comboFacultades;
+    private JComboBox<Escuela> comboEscuelas;
     private JList<Carrera> listaCarreras;
     private DefaultListModel<Carrera> modeloLista;
     private JButton btnConsultar;
 
     public VentanaCarreras() {
         setTitle("Catálogo de Carreras UASD");
-        setSize(600, 500);
+        setSize(1000, 700); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
-        // Panel Superior
-        JPanel panelTop = new JPanel(new FlowLayout());
-        panelTop.add(new JLabel("Seleccione Escuela:"));
+        // --- Panel Superior (Controles) ---
+        JPanel panelTop = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         
+        // 1. Combo de Facultades
+        panelTop.add(new JLabel("1. Facultad:"));
+        comboFacultades = new JComboBox<>();
+        cargarFacultades();
+        panelTop.add(comboFacultades);
+
+        // 2. Combo de Escuelas
+        panelTop.add(new JLabel("2. Escuela:"));
         comboEscuelas = new JComboBox<>();
-        cargarEscuelasEnCombo();
         panelTop.add(comboEscuelas);
 
-        btnConsultar = new JButton("Ver Carreras");
+        // 3. Botón
+        btnConsultar = new JButton("3. Buscar Carreras");
         panelTop.add(btnConsultar);
 
-                // Panel Central
+        // --- Panel Central (Lista) ---
         modeloLista = new DefaultListModel<>();
         listaCarreras = new JList<>(modeloLista);
-        
-        // --- MEJORAS VISUALES ---
-        // 1. Hacemos que la lista sea más alta
-        listaCarreras.setVisibleRowCount(15); 
-        
-        // 2. Ponemos una fuente más grande y legible (Arial, tamaño 14)
         listaCarreras.setFont(new Font("Arial", Font.PLAIN, 14)); 
-        
-        // 3. Agregamos un margen interno para que el texto no esté pegado al borde
-        listaCarreras.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
-        // 4. El ScrollPane (la barra de desplazamiento) para que funcione bien con listas largas
+        listaCarreras.setFixedCellHeight(25); 
+
         JScrollPane scrollPane = new JScrollPane(listaCarreras);
+        scrollPane.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createEtchedBorder(), "Carreras Ofertadas", TitledBorder.LEFT, TitledBorder.TOP, new Font("Arial", Font.BOLD, 12)));
 
         add(panelTop, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Acción del botón
-        btnConsultar.addActionListener(new ActionListener() {
+        // --- EVENTO: Cuando cambia la Facultad, se actualizan las Escuelas ---
+        comboFacultades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String escuelaSeleccionada = (String) comboEscuelas.getSelectedItem();
-                if (escuelaSeleccionada != null) {
-                    cargarCarreras(escuelaSeleccionada);
+                if (comboFacultades.getSelectedItem() != null) {
+                    String facultadSeleccionada = (String) comboFacultades.getSelectedItem();
+                    cargarEscuelas(facultadSeleccionada);
+                    modeloLista.clear();
                 }
             }
         });
 
-        setLocationRelativeTo(null);
+        // --- EVENTO: Botón para buscar carreras ---
+        btnConsultar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Escuela escuelaSeleccionada = (Escuela) comboEscuelas.getSelectedItem();
+                if (escuelaSeleccionada != null) {
+                    cargarCarreras(escuelaSeleccionada.getId());
+                }
+            }
+        });
+
+        setLocationRelativeTo(null); 
+        
+        // Cargar escuelas de la primera facultad al abrir
+        if (comboFacultades.getItemCount() > 0) {
+            cargarEscuelas((String) comboFacultades.getSelectedItem());
+        }
     }
 
-    private void cargarEscuelasEnCombo() {
-        String sql = "SELECT nombre FROM escuelas";
+    private void cargarFacultades() {
+        String sql = "SELECT nombre FROM facultades";
         try (Connection conn = Database.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                comboEscuelas.addItem(rs.getString("nombre"));
+                comboFacultades.addItem(rs.getString("nombre"));
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al cargar facultades: " + ex.getMessage());
+        }
+    }
+
+    private void cargarEscuelas(String nombreFacultad) {
+        comboEscuelas.removeAllItems();
+        String sql = "SELECT e.id, e.nombre FROM escuelas e JOIN facultades f ON e.facultad_id = f.id WHERE f.nombre = ?";
+        
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nombreFacultad);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    comboEscuelas.addItem(new Escuela(rs.getInt("id"), rs.getString("nombre")));
+                }
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error al cargar escuelas: " + ex.getMessage());
         }
     }
 
-    private void cargarCarreras(String nombreEscuela) {
-        modeloLista.clear();
-        String sql = "SELECT c.id, c.nombre FROM carreras c JOIN escuelas e ON c.escuela_id = e.id WHERE e.nombre = ?";
+    private void cargarCarreras(int idEscuela) {
+        modeloLista.clear(); 
+        String sql = "SELECT id, nombre FROM carreras WHERE escuela_id = ?";
+        
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, nombreEscuela);
+            pstmt.setInt(1, idEscuela);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Carrera carrera = new Carrera(rs.getInt("id"), rs.getString("nombre"));
                     modeloLista.addElement(carrera);
+                }
+                if (modeloLista.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Esta escuela no tiene carreras registradas aún.");
                 }
             }
         } catch (SQLException ex) {

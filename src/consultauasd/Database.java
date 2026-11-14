@@ -13,7 +13,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Database {
-    // OJO: Cambia "123456" por la contraseña que creaste en MySQL
+    
     private static final String URL = "jdbc:mysql://localhost:3306/uasd_carreras?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String USER = "root"; 
     private static final String PASS = "Jvaleriomota@gmail.com1"; // <--- TU CONTRASEÑA AQUÍ
