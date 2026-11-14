@@ -33,8 +33,8 @@ Aplicación de escritorio desarrollada en Java (Swing) que permite consultar el 
 
 ## Autor(es)
 - Grupo Impulso:
-Jaycob Ricardo Gómez Ortiz----------100529648
-Carlos Soto-------------------------100444290
+`Jaycob Ricardo Gómez Ortiz----------100529648`
+`Carlos Soto-------------------------100444290`
 Anderson Lebron---------------------100694831
 Harlem Castillo---------------------100073254
 José Falcon Muñoz-------------------100551022
