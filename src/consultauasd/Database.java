@@ -16,7 +16,7 @@ public class Database {
     
     private static final String URL = "jdbc:mysql://localhost:3306/uasd_carreras?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String USER = "root"; 
-    private static final String PASS = "contraseña"; // <--- TU CONTRASEÑA AQUÍ
+    private static final String PASS = "Jvaleriomota@gmail.com1"; // <--- TU CONTRASEÑA AQUÍ
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);

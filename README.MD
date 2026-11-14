@@ -32,14 +32,12 @@ Aplicación de escritorio desarrollada en Java (Swing) que permite consultar el 
   - `VentanaCarreras.java`: Interfaz gráfica. Contiene la lógica de eventos (ActionListeners) que conecta los menús desplegables con las consultas a la base de datos.
 
 ## Autor(es)
-**Grupo Impulso:**
-- Jaycob Ricardo Gómez Ortiz - 100529648
-- Carlos Soto - 100444290
-- Anderson Lebron - 100694831
-- Harlem Castillo - 100073254
-- José Falcon Muñoz - 100551022
+- Grupo Impulso:
+Jaycob Ricardo Gómez Ortiz----------100529648
+Carlos Soto-------------------------100444290
+Anderson Lebron---------------------100694831
+Harlem Castillo---------------------100073254
+José Falcon Muñoz-------------------100551022
 
-<br>
-
-**Universidad Autónoma de Santo Domingo (UASD)**  
-**Asignatura:** Laboratorio de Lenguaje de Programación IV
+- Universidad Autónoma de Santo Domingo (UASD)
+- Asignatura: Laboratorio de Lenguaje de Programación IV

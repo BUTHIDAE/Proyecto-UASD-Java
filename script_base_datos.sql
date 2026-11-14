@@ -1,11 +1,30 @@
+CREATE DATABASE IF NOT EXISTS uasd_carreras;
 USE uasd_carreras;
 
--- 1. Limpiamos las tablas
 SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE carreras;
-TRUNCATE TABLE escuelas;
-TRUNCATE TABLE facultades;
+DROP TABLE IF EXISTS carreras;
+DROP TABLE IF EXISTS escuelas;
+DROP TABLE IF EXISTS facultades;
 SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE facultades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE escuelas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    facultad_id INT,
+    FOREIGN KEY (facultad_id) REFERENCES facultades(id)
+);
+
+CREATE TABLE carreras (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(200) NOT NULL,
+    escuela_id INT,
+    FOREIGN KEY (escuela_id) REFERENCES escuelas(id)
+);
 
 -- 2. Insertamos TODAS las Facultades
 INSERT INTO facultades (id, nombre) VALUES 
